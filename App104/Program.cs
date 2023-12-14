@@ -1,4 +1,6 @@
 using App104.DAl;
+using App104.Repositories.Implementations;
+using App104.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace App104
@@ -15,6 +17,7 @@ namespace App104
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddScoped<IRepository, Repository>();
 
             var app = builder.Build();
 

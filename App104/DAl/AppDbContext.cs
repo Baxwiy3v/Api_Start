@@ -12,7 +12,12 @@ namespace App104.DAl
 
         public DbSet<Tag> Tags { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Category>().Property(c => c.Name).IsRequired().HasMaxLength(60);
 
+            base.OnModelCreating(modelBuilder);
+        }
 
 
     }
