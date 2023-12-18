@@ -1,5 +1,7 @@
 ﻿using App104.DAl;
+using App104.DTOS;
 using App104.Entities;
+using App104.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,85 +12,56 @@ namespace App104.Controllers
     [ApiController]
     public class TagsController : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public TagsController(AppDbContext context)
+        private readonly ITagService _service;
+        public TagsController(ITagService service)
         {
-            _context = context;
+
+            _service = service;
         }
 
-
-
         [HttpGet]
-
         public async Task<IActionResult> Get(int page = 1, int take = 2)
         {
-            List<Tag> Tags = await _context.Tags
-                .Skip((page - 1) * take)
-                .Take(take)
-                .ToListAsync();
-
-            return Ok(Tags);
+            return Ok(await _service.GetAllAsync(page, take));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
-            Tag tag = await _context.Tags
-                .FirstOrDefaultAsync(t => t.Id == id);
 
-            if (tag is null) return StatusCode(StatusCodes.Status404NotFound);
-            return StatusCode(StatusCodes.Status200OK,tag);
+            return Ok(await _service.GetAsync(id));
         }
-        [HttpPost]
-        public async Task<IActionResult> Create(Tag tag)
-        {
-            await _context.Tags.AddAsync(tag);
 
-            await _context.SaveChangesAsync();
+        [HttpPost]
+        public async Task<IActionResult> Create([FromForm] CreateTagDto tagDto)
+        {
+            await _service.CreateAsync(tagDto);
 
             return StatusCode(StatusCodes.Status201Created);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, string name)
+        public async Task<IActionResult> Update(int id, [FromForm] UpdateTagDto tagDto)
         {
-            
             if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
-           
-            Tag tag = await _context.Tags
-                .FirstOrDefaultAsync(t => t.Id == id);
 
-            if (tag is null) return StatusCode(StatusCodes.Status404NotFound);
-            tag.Name = name;
+            await _service.UpdateAsync(id, tagDto);
 
-            await _context.SaveChangesAsync();
-            return StatusCode(StatusCodes.Status204NoContent,tag);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            
             if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
-            
-            Tag tag = await _context.Tags
-                .FirstOrDefaultAsync(t => t.Id == id);
 
-            if (tag is null) return StatusCode(StatusCodes.Status404NotFound);
-          
-            _context.Tags.Remove(tag);
-           
-            await _context.SaveChangesAsync();
-            return StatusCode(StatusCodes.Status204NoContent,tag);
+
+            await _service.DeleteAsync(id);
+
+            return NoContent();
         }
-
-
-
-
     }
-
-
-
 }
+
+

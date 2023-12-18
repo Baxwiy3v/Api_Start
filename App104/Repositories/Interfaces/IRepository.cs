@@ -1,16 +1,35 @@
 ﻿using App104.Entities;
+using App104.Entities.Base;
 using System.Linq.Expressions;
 
 namespace App104.Repositories.Interfaces
 {
-    public interface IRepository
+    public interface IRepository<T> where T : BaseEntity, new()
     {
-        Task<IQueryable<Category>> GetAllAsync(Expression<Func<Category, bool>>? expression = null, params string[] includes);
-        Task<Category> GetByIdAsync(int id);
-        Task AddAsync(Category category);
-        Task SaveChangesAsync();
-        void Update(Category category);
-        void Delete(Category category);
+        IQueryable<T> GetAllOrderAsync(Expression<Func<T,
+            bool>>? expression = null, Expression<Func<T, 
+                object>>? orderExpression = null,
 
+            bool isDesc = false,
+
+            int skip = 0,
+
+            int take = 0, bool isTracking = true,
+
+            params string[] includes);
+
+        IQueryable<T> GetAllAsync(Expression<Func<T, bool>>? expression = null,
+            int skip = 0,
+            int take = 0, bool isTracking = true,
+            params string[] includes);
+        Task<T> GetByIdAsync(int id);
+
+        Task AddAsync(T item);
+
+        void Update(T item);
+
+        void Delete(T item);
+
+        Task SaveChangesAsync();
     }
 }

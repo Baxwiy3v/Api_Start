@@ -1,8 +1,6 @@
-﻿using App104.Entities.Base;
-
-namespace App104.Entities
+﻿namespace App104.DTOS.Category
 {
-    public class Tag : BaseEntity
+    public class GetCategoryDto
     {
         public int Id { get; set; }
         public string Name { get; set; }
